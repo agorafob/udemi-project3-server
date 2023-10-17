@@ -5,6 +5,7 @@ import com.alik.project3.serverapi.exceptions.sensors.SensorErrorResponse;
 import com.alik.project3.serverapi.exceptions.sensors.SensorNotCreatedException;
 import com.alik.project3.serverapi.models.Sensor;
 import com.alik.project3.serverapi.services.SensorsService;
+import com.alik.project3.serverapi.util.SensorValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +22,26 @@ import java.util.List;
 @RequestMapping("/sensors")
 public class SensorsController {
     private final SensorsService sensorsService;
+    private final SensorValidator sensorValidator;
     private final ModelMapper mapper;
 
     @Autowired
-    public SensorsController(SensorsService sensorsService, ModelMapper mapper) {
+    public SensorsController(SensorsService sensorsService, SensorValidator sensorValidator, ModelMapper mapper) {
         this.sensorsService = sensorsService;
+        this.sensorValidator = sensorValidator;
         this.mapper = mapper;
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<HttpStatus> createSensor(@RequestBody @Valid SensorDTO sensorDTO, BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
+    public ResponseEntity<HttpStatus> createSensor(@RequestBody @Valid SensorDTO sensorDTO, BindingResult bindingResult) {
+        sensorValidator.validate(sensorDTO, bindingResult);
+        if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            for (FieldError f:fieldErrors) {
+            for (FieldError f : fieldErrors) {
                 errorMsg.append(f.getField()).append("-").
                         append(f.getDefaultMessage()).append(";");
             }
-
             throw new SensorNotCreatedException(errorMsg.toString());
         }
 
@@ -53,8 +56,6 @@ public class SensorsController {
                 e.getMessage(), LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-
-
 
 
 }

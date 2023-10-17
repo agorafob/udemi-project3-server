@@ -19,9 +19,19 @@ public class Measurement {
     @DecimalMax(value = "100.00",message = "Value should be max 100.00")
     private double value;
 
+//    @Column(name = "value")
+//    @NotNull
+//    @Min(value = -100,message = "Value should be min -100.00")
+//    @Max(value = 100,message = "Value should be max 100.00")
+//    private Double value;
+
+
     @Column(name = "raining")
     @NotNull(message = "Raining report should not be empty")
     private boolean raining;
+
+//    private Boolean raining;
+
 
     @Column(name = "received_at")
     private LocalDateTime received_at;
